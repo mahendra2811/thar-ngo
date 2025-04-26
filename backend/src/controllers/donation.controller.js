@@ -1,13 +1,7 @@
-const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const Donation = require('../models/donation.model');
 const emailService = require('../services/email.service');
-
-// Initialize Razorpay
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+const razorpay = require('../config/razorpay.config');
 
 /**
  * Get Razorpay key
@@ -15,6 +9,13 @@ const razorpay = new Razorpay({
  */
 exports.getRazorpayKey = (req, res) => {
   try {
+    if (!process.env.RAZORPAY_KEY_ID) {
+      return res.status(503).json({
+        success: false,
+        message: 'Payment service is currently unavailable'
+      });
+    }
+    
     res.status(200).json({
       success: true,
       key: process.env.RAZORPAY_KEY_ID
@@ -34,6 +35,14 @@ exports.getRazorpayKey = (req, res) => {
  */
 exports.createOrder = async (req, res) => {
   try {
+    // Check if Razorpay is initialized
+    if (!razorpay) {
+      return res.status(503).json({
+        success: false,
+        message: 'Payment service is currently unavailable'
+      });
+    }
+    
     const { amount } = req.body;
     
     // Validate amount
@@ -84,6 +93,14 @@ exports.createOrder = async (req, res) => {
  */
 exports.verifyPayment = async (req, res) => {
   try {
+    // Check if Razorpay is initialized
+    if (!razorpay || !process.env.RAZORPAY_KEY_SECRET) {
+      return res.status(503).json({
+        success: false,
+        message: 'Payment service is currently unavailable'
+      });
+    }
+    
     const { orderId, paymentId, signature } = req.body;
 
     // Find donation in database

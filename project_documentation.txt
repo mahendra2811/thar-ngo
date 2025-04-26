@@ -1,0 +1,219 @@
+# THAR NGO Website Project Documentation
+
+## Project Overview
+This documentation outlines the implementation plan for the THAR NGO website, a platform dedicated to helping animals in the Thar region by providing water, medical assistance, and other necessary support. The website will connect a React frontend with a Node.js/MongoDB backend and implement various user roles with different access levels.
+
+## Core Objectives
+- Connect frontend with backend (Node.js, MongoDB)
+- Implement contact form submission to backend
+- Add newsletter subscription functionality
+- Create a comprehensive authentication system with role-based access
+- Enable donation processing with certificate generation
+- Allow team members to create blogs/reports (with admin approval)
+- Implement expense tracking and reporting
+
+## User Roles and Permissions
+
+### 1. Normal Visitor
+- Can browse the website without login
+- Can donate money and receive certificates
+- Can submit details about animal help cases for reimbursement
+- Can request to view expenses for specific months or projects
+- Can contact the NGO through the contact form
+- Can subscribe to the newsletter
+
+### 2. Donor
+- Access granted after email verification
+- Can view all expense reports uploaded by admin
+- Can make additional donations
+- Has access to donor-specific information
+
+### 3. NGO Team Member
+- Can upload photos and documents about events
+- Can create blog posts (requires admin approval)
+- Can document animal rescue/help cases
+
+### 4. Admin
+- Can view all contact form submissions
+- Can upload daily expenses and income records
+- Can view all donor information
+- Can access visitor data (email, phone number)
+- Can filter users by donor status, mobile number, email
+- Can manage user access (block, blacklist, promote to donor)
+- Can post new blogs with images and text
+- Can approve blogs written by team members or visitors
+
+### 5. Super Admin
+- Has all permissions of other roles
+- Complete system access and control
+
+## Implementation Plan
+
+### Phase 1: Backend Setup and Database Configuration
+
+1. **Set up MongoDB Database**
+   - Create database schemas for users, donations, expenses, blogs, and contact submissions
+   - Implement data validation and relationships
+
+2. **Create Backend API Structure**
+   - Set up Node.js/Express server
+   - Implement RESTful API endpoints
+   - Configure middleware for authentication and validation
+
+3. **Implement Authentication System**
+   - Create user registration and login endpoints
+   - Implement JWT-based authentication
+   - Set up role-based access control
+   - Create password reset functionality
+
+4. **Contact Form and Newsletter API**
+   - Create endpoints to handle contact form submissions
+   - Implement newsletter subscription functionality
+   - Set up email notification system
+
+### Phase 2: Frontend-Backend Integration
+
+1. **Connect Frontend to Backend**
+   - Set up API service in React frontend
+   - Implement authentication state management
+   - Create protected routes based on user roles
+
+2. **Implement Contact Form Submission**
+   - Connect the existing contact form to the backend API
+   - Add form validation and success/error handling
+   - Implement CSRF protection
+
+3. **Add Newsletter Functionality to Footer**
+   - Connect the newsletter form to the backend API
+   - Add validation and success/error messages
+   - Implement double opt-in process
+
+### Phase 3: User Management and Role-Based Features
+
+1. **User Authentication UI**
+   - Create login and registration pages
+   - Implement forgot password functionality
+   - Add profile management
+
+2. **Role-Based Dashboard**
+   - Create different dashboard views based on user roles
+   - Implement access control on frontend components
+
+3. **Admin Panel**
+   - Create user management interface
+   - Implement blog approval system
+   - Add expense upload and management
+   - Create donor management tools
+
+### Phase 4: Donation System
+
+1. **Donation Processing**
+   - Integrate payment gateway (Razorpay)
+   - Implement donation form and processing
+   - Create donation receipt/certificate generation
+
+2. **Expense Reporting**
+   - Create expense entry interface for admins
+   - Implement expense viewing for donors
+   - Add filtering and reporting features
+
+### Phase 5: Content Management
+
+1. **Blog System**
+   - Create blog post creation interface for team members
+   - Implement admin approval workflow
+   - Add blog display on public-facing pages
+
+2. **Animal Help Case Reporting**
+   - Create form for submitting animal help cases
+   - Implement document upload functionality
+   - Add reimbursement request processing
+
+## Technical Requirements
+
+### Backend
+- Node.js with Express
+- MongoDB for database
+- JWT for authentication
+- Multer for file uploads
+- Nodemailer for email functionality
+- Mongoose for database modeling
+
+### Frontend
+- React.js
+- React Router for navigation
+- Context API or Redux for state management
+- Axios for API requests
+- Form validation libraries
+- Responsive design with CSS/SCSS
+
+### Security Considerations
+- Input validation on both frontend and backend
+- CSRF protection
+- Rate limiting for sensitive endpoints
+- Secure password storage with bcrypt
+- JWT with appropriate expiration
+- Role-based access control
+
+## API Endpoints (Initial Plan)
+
+### Authentication
+- POST /api/auth/register - User registration
+- POST /api/auth/login - User login
+- POST /api/auth/forgot-password - Password reset request
+- POST /api/auth/reset-password - Password reset
+
+### Users
+- GET /api/users - Get all users (admin only)
+- GET /api/users/:id - Get user by ID
+- PUT /api/users/:id - Update user
+- DELETE /api/users/:id - Delete user
+- PUT /api/users/:id/role - Update user role (admin only)
+
+### Contact
+- POST /api/contact - Submit contact form
+- GET /api/contact - Get all contact submissions (admin only)
+
+### Newsletter
+- POST /api/newsletter/subscribe - Subscribe to newsletter
+- GET /api/newsletter/subscribers - Get all subscribers (admin only)
+
+### Donations
+- POST /api/donations - Process new donation
+- GET /api/donations - Get all donations (admin only)
+- GET /api/donations/user/:userId - Get donations by user
+- GET /api/donations/certificate/:id - Generate certificate for donation
+
+### Expenses
+- POST /api/expenses - Add new expense (admin only)
+- GET /api/expenses - Get all expenses (donor/admin only)
+- GET /api/expenses/filter - Get filtered expenses
+
+### Blogs
+- POST /api/blogs - Create new blog (team/admin)
+- GET /api/blogs - Get all blogs
+- GET /api/blogs/pending - Get pending blogs (admin only)
+- PUT /api/blogs/:id/approve - Approve blog (admin only)
+- PUT /api/blogs/:id - Update blog
+- DELETE /api/blogs/:id - Delete blog
+
+### Help Cases
+- POST /api/help-cases - Submit new help case
+- GET /api/help-cases - Get all help cases (admin only)
+- GET /api/help-cases/user/:userId - Get help cases by user
+- PUT /api/help-cases/:id/status - Update help case status (admin only)
+
+## Next Steps
+
+1. Review existing frontend code to understand the current structure
+2. Set up MongoDB database and connection
+3. Create user authentication backend
+4. Implement contact form and newsletter backend
+5. Connect frontend forms to backend
+6. Develop user role system
+7. Implement donation processing
+8. Create admin dashboard
+9. Add blog creation and approval system
+10. Implement expense tracking and reporting
+
+This documentation provides a roadmap for implementing the THAR NGO website. The development should proceed in phases, with each phase building upon the previous one to create a comprehensive platform for animal welfare support.

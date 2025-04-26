@@ -5,15 +5,32 @@ const nodemailer = require('nodemailer');
  */
 class EmailService {
   constructor() {
-    this.transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      secure: process.env.EMAIL_PORT === '465', // true for 465, false for other ports
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+    // Check if email credentials are set
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      // Use service if specified, otherwise use host/port
+      if (process.env.EMAIL_SERVICE) {
+        this.transporter = nodemailer.createTransport({
+          service: process.env.EMAIL_SERVICE,
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+          }
+        });
+      } else {
+        this.transporter = nodemailer.createTransport({
+          host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+          port: process.env.EMAIL_PORT || 587,
+          secure: process.env.EMAIL_PORT === '465', // true for 465, false for other ports
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+          }
+        });
       }
-    });
+    } else {
+      console.warn('Email credentials not found in environment variables. Email functionality will be limited.');
+      this.transporter = null;
+    }
   }
 
   /**
@@ -23,10 +40,17 @@ class EmailService {
    * @returns {Promise} - Nodemailer send mail promise
    */
   async sendVerificationEmail(to, token) {
-    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+    // If transporter is not initialized, log a message and return
+    if (!this.transporter) {
+      console.log(`[Email Service] Verification email would be sent to ${to} with token ${token}`);
+      console.log(`[Email Service] Verification URL would be: ${process.env.FRONTEND_URL}/verify-email?token=${token}`);
+      return Promise.resolve({ message: 'Email sending skipped - no email configuration' });
+    }
+    
+    const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${token}`;
     
     const mailOptions = {
-      from: `"Sanjivani NGO" <${process.env.EMAIL_USER}>`,
+      from: `"Sanjivani NGO" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
       to,
       subject: 'Email Verification - Sanjivani NGO',
       html: `
@@ -45,7 +69,12 @@ class EmailService {
       `
     };
 
-    return this.transporter.sendMail(mailOptions);
+    try {
+      return await this.transporter.sendMail(mailOptions);
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      return Promise.resolve({ message: 'Email sending failed', error });
+    }
   }
 
   /**
@@ -55,8 +84,15 @@ class EmailService {
    * @returns {Promise} - Nodemailer send mail promise
    */
   async sendDonationReceipt(to, donation) {
+    // If transporter is not initialized, log a message and return
+    if (!this.transporter) {
+      console.log(`[Email Service] Donation receipt would be sent to ${to}`);
+      console.log(`[Email Service] Donation details: ${JSON.stringify(donation)}`);
+      return Promise.resolve({ message: 'Email sending skipped - no email configuration' });
+    }
+    
     const mailOptions = {
-      from: `"Sanjivani NGO" <${process.env.EMAIL_USER}>`,
+      from: `"Sanjivani NGO" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
       to,
       subject: 'Donation Receipt - Sanjivani NGO',
       html: `
@@ -78,7 +114,12 @@ class EmailService {
       `
     };
 
-    return this.transporter.sendMail(mailOptions);
+    try {
+      return await this.transporter.sendMail(mailOptions);
+    } catch (error) {
+      console.error('Error sending donation receipt email:', error);
+      return Promise.resolve({ message: 'Email sending failed', error });
+    }
   }
 }
 

@@ -10,6 +10,9 @@ dotenv.config();
 const authRoutes = require('./routes/auth.routes');
 const donationRoutes = require('./routes/donation.routes');
 const userRoutes = require('./routes/user.routes');
+const contactRoutes = require('./routes/contact.routes');
+const newsletterRoutes = require('./routes/newsletter.routes');
+const blogRoutes = require('./routes/blog.routes');
 
 // Import middleware
 const errorHandler = require('./middleware/error.middleware');
@@ -44,6 +47,9 @@ app.use(cors({
 app.use('/api/v1/registration', authRoutes);
 app.use('/api/v1/donate', donationRoutes);
 app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/contact', contactRoutes);
+app.use('/api/v1/newsletter', newsletterRoutes);
+app.use('/api/v1/blogs', blogRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {
